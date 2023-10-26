@@ -5,7 +5,6 @@ ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", 
 
 
 class Card:
-# create card class
     def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
@@ -51,74 +50,84 @@ class Hand:
             print(card)
         print()
 
-is_game_over = False
+class BlackjackGame:
+    def __init__(self):
+        self.is_game_over = False
+    def play_game(self):
+        while not self.is_game_over:
+            print("\nLet's play Blackjack \n")
+            deck = Deck()
 
-def hit_or_stand():
-    user_choice = input("Hit or Stand? ")
-    if user_choice.lower() == "hit":
-        player_new_card = deck.deal()
-        player_hand.add_card(player_new_card)
-        print("\nNew card for the player: ")
-        print(player_new_card)
-    else:
-        is_game_over = True
+            # Deal two cards to player and dealer
+            player_hand = Hand()
+            player_hand.add_card(deck.deal())
+            player_hand.add_card(deck.deal())
 
-def double_down(player_hand, deck):
-    additional_card = deck.deal()
-    player_hand.add_card(additional_card)
-    print("Additional card for the player: ")
-    print(additional_card)
+            dealer_hand = Hand()
+            dealer_hand.add_card(deck.deal())
+            dealer_hand.add_card(deck.deal())
 
-def check_winner(player, dealer):
-    if 16 < player < 21 and 16 < dealer < 21 and player == dealer:
-        print("\nPush\n")
+            # Print the player's and dealer's cards
+            print("Player's cards: ")
+            player_hand.show_cards()
+            print("Dealer's cards: ")
+            dealer_hand.show_cards()
 
-    elif player > 21:
-        print("\nYou lose, it went over 21\n")
+            # If player wants to double down
+            if player_hand.value in [9, 10, 11]:
+                user_choice = input("Double down? (Yes/No) ")
+                if user_choice.lower() == "yes":
+                    additional_card = deck.deal()
+                    player_hand.add_card(additional_card)
+                    print("Additional card for the player: ")
+                    print(additional_card)
+                else:
+                    if player_hand.value < 21:
+                        user_choice = input("Hit or Stand? ")
+                        if user_choice.lower() == "hit":
+                            player_new_card = deck.deal()
+                            player_hand.add_card(player_new_card)
+                            print("\nNew card for the player: ")
+                            print(player_new_card)
+                        else:
+                            break
+            
+            while player_hand.value < 21:
+                    user_choice = input("Hit or Stand? ")
+                    if user_choice.lower() == "hit":
+                        player_new_card = deck.deal()
+                        player_hand.add_card(player_new_card)
+                        print("\nNew card for the player: ")
+                        print(player_new_card)
+                    else:
+                        break
+            
+            # dealer keeps hitting until it reaches 17
+            while dealer_hand.value < 17:
+                dealer_new_card = deck.deal()
+                dealer_hand.add_card(dealer_new_card)
+                print("\nNew card for the dealer: ")
+                print(dealer_new_card)            
+            
+            if 16 < player_hand.value < 21 and 16 < dealer_hand.value < 21 and player_hand.value == dealer_hand.value:
+                print("\nPush\n")
 
-    elif dealer > 21:
-        print("\nYou win, Dealer went over 21\n")
+            elif player_hand.value > 21:
+                print("\nYou lose, it went over 21\n")
 
-    elif player > dealer:
-        print("\nYou win\n")
+            elif dealer_hand.value > 21:
+                print("\nYou win, Dealer went over 21\n")
 
-    elif dealer > player:
-        print("\nYou lose\n")
+            elif player_hand.value > dealer_hand.value:
+                print("\nYou win\n")
 
+            elif dealer_hand.value > player_hand.value:
+                print("\nYou lose\n")
+            
+            print(f"Player's total score: {player_hand.value}")
+            print(f"Dealer's total score: {dealer_hand.value}")
 
-while not is_game_over:
-    print("\nLet's play Blackjack \n")
-    deck = Deck()
+            self.is_game_over = True
 
-    # Deal two cards to player and dealer
-
-    player_hand = Hand()
-    player_hand.add_card(deck.deal())
-    player_hand.add_card(deck.deal())
-
-    dealer_hand = Hand()
-    dealer_hand.add_card(deck.deal())
-    dealer_hand.add_card(deck.deal())
-
-    # Print the player's and dealer's cards
-    print("Player's cards: ")
-    player_hand.show_cards()
-    print("Dealer's cards: ")
-    dealer_hand.show_cards()
-
-    if player_hand.value in [9, 10, 11]:
-        user_choice = input("Double down? (Yes/No) ")
-        if user_choice.lower() == "yes":
-            double_down(player_hand, deck)
-        else:
-            if player_hand.value < 21:
-                hit_or_stand()
-
-        while dealer_hand.value < 17:
-            dealer_new_card = deck.deal()
-            dealer_hand.add_card(dealer_new_card)
-            print("\nNew card for the dealer: ")
-            print(dealer_new_card)
-
-        is_game_over = True
-        check_winner(player_hand.value, dealer_hand.value)
+game = BlackjackGame()
+game.play_game()
